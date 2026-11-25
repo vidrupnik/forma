@@ -37,7 +37,7 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{background:var(--bg)}
-body{color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+body{padding-top:env(safe-area-inset-top,0px);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
 .wrap{max-width:640px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 calc(96px + env(safe-area-inset-bottom,0px))}
 h1,h2,h3{font-family:var(--display);font-weight:700;letter-spacing:.01em;text-wrap:balance;margin:0}
@@ -53,7 +53,7 @@ button{cursor:pointer}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 /* header */
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);padding-block:12px 10px;border-bottom:1px solid var(--line)}
+.top{position:relative;z-index:1;background:var(--bg);padding-block:12px 10px;border-bottom:1px solid var(--line)}
 .top-row{display:flex;align-items:center;gap:12px}
 .ring{flex:none;position:relative;width:56px;height:56px;display:grid;place-items:center}
 .ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
@@ -137,8 +137,9 @@ section.view.on{display:flex;flex-direction:column;gap:18px}
 .tick.on::after{content:"";position:absolute;left:50%;top:45%;width:12px;height:7px;border-left:3px solid #fff;border-bottom:3px solid #fff;transform:translate(-50%,-50%) rotate(-45deg)}
 .set-head{display:grid;grid-template-columns:28px 1fr 1fr 44px;gap:8px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;text-align:center}
 .pr-tag{font-size:11px;font-weight:700;background:var(--accent-soft);color:var(--accent);padding:2px 8px;border-radius:99px}
-.timer{margin-top:10px;background:var(--fg);color:var(--bg);border-radius:12px;padding:10px 16px;display:flex;gap:14px;align-items:center;font-family:var(--display);font-size:22px;font-weight:700}
+.timer{position:fixed;z-index:25;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));bottom:calc(72px + env(safe-area-inset-bottom,0px));max-width:608px;margin:0 auto;box-shadow:0 8px 24px rgb(0 0 0 / .25);background:var(--fg);color:var(--bg);border-radius:12px;padding:10px 16px;display:flex;gap:14px;align-items:center;font-family:var(--display);font-size:22px;font-weight:700}
 .timer #timerVal{flex:1}
+body:has(#timer:not([hidden])) main.wrap{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
 .timer button{background:transparent;border:0;color:inherit;font-family:var(--body);font-size:13px;text-decoration:underline;white-space:nowrap}
 
 /* info blocks */
