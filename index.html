@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Forma</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Forma">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0f1411">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one-column phone app, sticky score header, fixed bottom tab bar; cards only for things you act on. */
+:root{
+  --bg:#f3f4f1; --surface:#ffffff; --surface2:#e9ebe6; --line:#d6d9d2;
+  --fg:#17201b; --muted:#5d675f; --accent:#e4570f; --accent-fg:#ffffff; --accent-soft:#fde5d7;
+  --pitch:#1f7a4a; --pitch-soft:#d9efe2; --sky:#2d6cdf; --sky-soft:#dde8fb; --warn:#b42318; --warn-soft:#fbe3e1; --gold:#b7861d;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:12px;
+  --hero-a:#17201b; --hero-b:#24352b; --hero-fg:#f5f7f2;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1411; --surface:#171e19; --surface2:#202923; --line:#2c3730;
+  --fg:#e9eee9; --muted:#9aa69d; --accent:#ff7a33; --accent-fg:#1a0d05; --accent-soft:#3a2216;
+  --pitch:#4cc386; --pitch-soft:#173526; --sky:#7aa7ff; --sky-soft:#1b2a45; --warn:#ff7b6e; --warn-soft:#3c1c19; --gold:#e3b54b; --hero-a:#1d2a22; --hero-b:#0f1411; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1411; --surface:#171e19; --surface2:#202923; --line:#2c3730;
+  --fg:#e9eee9; --muted:#9aa69d; --accent:#ff7a33; --accent-fg:#1a0d05; --accent-soft:#3a2216;
+  --pitch:#4cc386; --pitch-soft:#173526; --sky:#7aa7ff; --sky-soft:#1b2a45; --warn:#ff7b6e; --warn-soft:#3c1c19; --gold:#e3b54b; --hero-a:#1d2a22; --hero-b:#0f1411; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--bg)}
+body{color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+.wrap{max-width:640px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 calc(96px + env(safe-area-inset-bottom,0px))}
+h1,h2,h3{font-family:var(--display);font-weight:700;letter-spacing:.01em;text-wrap:balance;margin:0}
+h2{font-size:28px;line-height:1.1}
+h3{font-size:20px;line-height:1.15}
+p{margin:0}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);padding-block:12px 10px;border-bottom:1px solid var(--line)}
+.top-row{display:flex;align-items:center;gap:12px}
+.ring{flex:none;position:relative;width:56px;height:56px;display:grid;place-items:center}
+.ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.ring .rb{fill:none;stroke:var(--surface2);stroke-width:5}
+.ring .rf{fill:none;stroke:var(--accent);stroke-width:5;stroke-linecap:round;stroke-dasharray:144.5;stroke-dashoffset:144.5;transition:stroke-dashoffset .8s cubic-bezier(.2,.8,.2,1)}
+.ring span{font-family:var(--display);font-size:24px;font-weight:800;line-height:1}
+.top-main{flex:1;min-width:0}
+.top-name{font-family:var(--display);font-size:22px;font-weight:700;line-height:1}
+.bar{height:8px;border-radius:99px;background:var(--surface2);overflow:hidden;margin-top:6px}
+.bar>i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .5s ease}
+.bar.green>i{background:var(--pitch)}
+.top-pts{text-align:right;flex:none}
+.top-pts b{font-family:var(--display);font-size:26px;font-weight:800;line-height:1;display:block}
+.sync{font-size:11px;color:var(--muted);margin-top:4px}
+
+section.view{display:none;padding-top:18px}
+section.view.on{display:flex;flex-direction:column;gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.stack{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.grid2>*,.grid3>*{min-width:0}
+
+.btn{border:0;border-radius:10px;padding:12px 16px;font-weight:600;background:var(--surface2);color:var(--fg)}
+.btn.primary{background:var(--accent);color:var(--accent-fg)}
+.btn.green{background:var(--pitch);color:#fff}
+.btn.ghost{background:transparent;border:1px solid var(--line)}
+.btn.block{width:100%}
+.btn.sm{padding:8px 12px;font-size:13px}
+.btn:disabled{opacity:.45;cursor:default}
+
+/* hero today */
+.today{position:relative;overflow:hidden;background:radial-gradient(120% 90% at 100% 0%,color-mix(in srgb,var(--accent) 55%,transparent),transparent 60%),linear-gradient(160deg,var(--hero-a),var(--hero-b));color:var(--hero-fg);border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.today::after{content:attr(data-big);position:absolute;right:-6px;bottom:-30px;font-family:var(--display);font-weight:800;font-size:150px;line-height:1;color:var(--hero-fg);opacity:.07;pointer-events:none}
+.today>*{position:relative;z-index:1}
+.xpchip{align-self:flex-start;background:var(--hero-fg);color:var(--hero-a);font-family:var(--display);font-weight:800;font-size:15px;padding:3px 10px;border-radius:99px}
+.today .label{color:color-mix(in srgb,var(--hero-fg) 70%,transparent)}
+.today h2{font-size:34px}
+.today .btn.ghost{border-color:color-mix(in srgb,var(--hero-fg) 40%,transparent);color:var(--hero-fg)}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px}
+.kpi b{font-family:var(--display);font-size:30px;font-weight:800;line-height:1;display:block}
+
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.wd{border-radius:10px;background:var(--surface2);padding:8px 2px;text-align:center;font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px;align-items:center}
+.wd b{font-family:var(--display);font-size:15px;color:var(--fg)}
+.wd.is-today{outline:2px solid var(--accent)}
+.dots{display:flex;gap:3px;height:8px}
+.dot{width:8px;height:8px;border-radius:50%}
+.d-gym{background:var(--accent)} .d-rehab{background:var(--pitch)} .d-cardio{background:var(--sky)} .d-foot{background:var(--gold)}
+
+.check{display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;background:var(--surface2);border:0;width:100%;text-align:left}
+.check .box{flex:none;width:26px;height:26px;border-radius:8px;border:2px solid var(--line);display:grid;place-items:center;background:var(--surface)}
+.check.done .box{background:var(--pitch);border-color:var(--pitch)}
+.check.done .box::after{content:"";width:10px;height:6px;border-left:3px solid #fff;border-bottom:3px solid #fff;transform:rotate(-45deg) translate(1px,-1px)}
+.check .t{flex:1;min-width:0}
+.pts{font-family:var(--display);font-weight:700;color:var(--accent);font-size:15px;flex:none}
+
+.prot{display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:10px;background:var(--surface2)}
+.prot-btns{display:flex;gap:8px;flex-wrap:wrap}
+
+/* segmented */
+.seg{display:grid;grid-template-columns:repeat(4,1fr);background:var(--surface2);border-radius:12px;padding:4px;gap:4px}
+.seg.two{grid-template-columns:1fr 1fr}
+.seg button{border:0;background:transparent;border-radius:9px;padding:10px 4px;font-family:var(--display);font-size:17px;font-weight:700;color:var(--muted)}
+.seg button.on{background:var(--surface);color:var(--fg);box-shadow:0 1px 2px rgb(0 0 0 / .12)}
+
+/* exercise */
+.ex{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px}
+.ex-head{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.ex-name{font-weight:600;font-size:16px}
+.ex-target{font-family:var(--display);font-size:17px;font-weight:700;color:var(--accent);flex:none}
+.sets{display:flex;flex-direction:column;gap:6px}
+.set{display:grid;grid-template-columns:28px 1fr 1fr 44px;gap:8px;align-items:center}
+.set .n{font-family:var(--display);font-weight:700;color:var(--muted);text-align:center}
+.set input{width:100%;min-width:0;padding:10px;border-radius:9px;border:1px solid var(--line);background:var(--bg);font-variant-numeric:tabular-nums;text-align:center;font-size:16px}
+.tick{width:44px;height:42px;border-radius:9px;border:2px solid var(--line);background:var(--surface)}
+.tick.on{background:var(--pitch);border-color:var(--pitch);position:relative}
+.tick.on::after{content:"";position:absolute;left:50%;top:45%;width:12px;height:7px;border-left:3px solid #fff;border-bottom:3px solid #fff;transform:translate(-50%,-50%) rotate(-45deg)}
+.set-head{display:grid;grid-template-columns:28px 1fr 1fr 44px;gap:8px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;text-align:center}
+.pr-tag{font-size:11px;font-weight:700;background:var(--accent-soft);color:var(--accent);padding:2px 8px;border-radius:99px}
+.timer{margin-top:10px;background:var(--fg);color:var(--bg);border-radius:12px;padding:10px 16px;display:flex;gap:14px;align-items:center;font-family:var(--display);font-size:22px;font-weight:700}
+.timer #timerVal{flex:1}
+.timer button{background:transparent;border:0;color:inherit;font-family:var(--body);font-size:13px;text-decoration:underline;white-space:nowrap}
+
+/* info blocks */
+.note{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 14px;border-radius:0 10px 10px 0}
+.note.warn{border-color:var(--warn);background:var(--warn-soft)}
+.note.good{border-color:var(--pitch);background:var(--pitch-soft)}
+ul.clean{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl td,.tbl th{padding:9px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.tbl th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.tbl td.r,.tbl th.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.scroll-x{overflow-x:auto}
+
+.phase{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.phase button{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.phase button b{font-family:var(--display);font-size:22px}
+.phase button span{font-size:11px;color:var(--muted)}
+.phase button.on{background:var(--pitch);border-color:var(--pitch);color:#fff}
+.phase button.on span{color:#e5fff0}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.pain-val{font-family:var(--display);font-size:34px;font-weight:800;line-height:1}
+
+/* field */
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field input{padding:11px;border-radius:9px;border:1px solid var(--line);background:var(--bg);font-size:16px;width:100%;min-width:0}
+
+/* chart */
+.chart svg{width:100%;height:auto;display:block}
+
+/* calendar */
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.cal .h{font-size:11px;text-align:center;color:var(--muted);font-weight:600}
+.cal .c{aspect-ratio:1;max-width:100%;border-radius:8px;background:var(--surface2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12px;font-variant-numeric:tabular-nums}
+.cal .c.x{background:var(--accent);color:var(--accent-fg);font-weight:700}
+.cal .c.soft{background:var(--pitch-soft)}
+.cal .c.empty{background:transparent}
+.cal .c.today{outline:2px solid var(--fg)}
+
+/* rewards */
+.reward{display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface)}
+.reward.unlocked{border-color:var(--gold)}
+.reward.claimed{opacity:.7}
+.reward input{border:0;border-bottom:1px dashed var(--line);background:transparent;padding:4px 0;width:100%;font-weight:600;font-size:15px}
+.chip{font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--surface2);color:var(--muted);white-space:nowrap}
+.chip.gold{background:var(--gold);color:#fff}
+.chip.green{background:var(--pitch);color:#fff}
+.levels{display:flex;flex-direction:column;gap:6px}
+.levels div{display:flex;justify-content:space-between;padding:8px 10px;border-radius:8px;background:var(--surface2);font-size:14px}
+.levels div.cur{background:var(--accent);color:var(--accent-fg);font-weight:700}
+
+/* nav */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+nav.tabs .in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr)}
+nav.tabs button{border:0;background:transparent;padding:9px 2px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--muted);font-weight:600}
+nav.tabs button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+nav.tabs button.on{color:var(--accent)}
+
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 14px);transform:translate(-50%,-220%);visibility:hidden;z-index:40;background:var(--accent);color:var(--accent-fg);padding:12px 18px;border-radius:12px;font-weight:700;transition:transform .35s ease;max-width:calc(100% - 32px);text-align:center;box-shadow:0 8px 24px rgb(0 0 0 / .2)}
+.toast.show{transform:translate(-50%,0);visibility:visible}
+.hist{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);align-items:center}
+.hist:last-child{border-bottom:0}
+.example{font-size:11px;font-weight:700;color:var(--muted);border:1px dashed var(--line);padding:2px 8px;border-radius:99px}
+
+/* how-to */
+details.how{border-top:1px dashed var(--line);padding-top:8px}
+details.how summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--sky);list-style:none;display:flex;align-items:center;gap:6px}
+details.how summary::-webkit-details-marker{display:none}
+details.how summary::before{content:"";width:0;height:0;border-left:6px solid currentColor;border-top:4px solid transparent;border-bottom:4px solid transparent;transition:transform .2s}
+details.how[open] summary::before{transform:rotate(90deg)}
+details.how ol{margin:8px 0 10px;padding-left:20px;font-size:14px;display:flex;flex-direction:column;gap:4px}
+.yt{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--fg);text-decoration:none;background:var(--surface2);padding:8px 12px;border-radius:9px}
+.yt::before{content:"";width:0;height:0;border-left:9px solid var(--warn);border-top:6px solid transparent;border-bottom:6px solid transparent}
+.rex{display:flex;flex-direction:column;gap:4px}
+.rex .yt{align-self:flex-start;margin-left:38px;padding:5px 10px;font-size:12px}
+/* photos */
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.photos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.ph{position:relative;border-radius:10px;overflow:hidden;background:var(--surface2);aspect-ratio:3/4;max-width:100%}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph span{position:absolute;left:6px;bottom:6px;font-size:11px;font-weight:700;background:rgb(0 0 0 / .55);color:#fff;padding:2px 7px;border-radius:99px}
+.ph button{position:absolute;right:6px;top:6px;border:0;border-radius:99px;background:rgb(0 0 0 / .55);color:#fff;font-size:11px;padding:3px 8px}
+.cmp{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:3/4;max-width:100%;background:var(--surface2);user-select:none}
+.cmp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cmp .before{clip-path:inset(0 50% 0 0)}
+.cmp .div{position:absolute;top:0;bottom:0;left:50%;width:3px;background:#fff;box-shadow:0 0 8px rgb(0 0 0 / .4)}
+.cmp .tag{position:absolute;top:10px;font-size:12px;font-weight:700;background:rgb(0 0 0 / .55);color:#fff;padding:3px 9px;border-radius:99px}
+.cmp input{position:absolute;inset:auto 12px 12px 12px;width:calc(100% - 24px)}
+/* badges */
+.badges{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.bdg{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;font-size:11px;font-weight:600;color:var(--muted)}
+.bdg .hex{width:58px;height:64px;display:grid;place-items:center;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);background:var(--surface2);font-family:var(--display);font-weight:800;font-size:22px;color:var(--muted)}
+.bdg.on{color:var(--fg)}
+.bdg.on .hex{background:linear-gradient(150deg,var(--gold),var(--accent));color:#fff}
+.flame{display:inline-block;width:18px;height:22px;vertical-align:-3px;margin-left:4px}
+.flame path{fill:var(--accent)}
+.kpi.hot{border-color:var(--accent);background:linear-gradient(180deg,var(--accent-soft),var(--surface))}
+.questbar{display:flex;gap:4px}
+.questbar i{flex:1;height:6px;border-radius:99px;background:var(--surface2)}
+.questbar i.on{background:var(--pitch)}
+/* level up */
+.lvlup{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:rgb(10 14 12 / .82);padding:24px;text-align:center;color:#fff}
+.lvlup canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.lvlup .box{position:relative;display:flex;flex-direction:column;gap:10px;align-items:center;animation:pop .6s cubic-bezier(.2,1.4,.4,1)}
+.lvlup .big{font-family:var(--display);font-size:96px;font-weight:800;line-height:.9;color:#ff7a33}
+.lvlup h2{font-size:40px;color:#fff}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.ex.done{border-color:var(--pitch)}
+.ex-top{display:flex;gap:12px;align-items:center}
+.ex-top .ex-head{flex:1;min-width:0;flex-direction:column;gap:2px;align-items:flex-start}
+.ex-img{position:relative;flex:none;width:96px;height:64px;border-radius:8px;overflow:hidden;background:var(--surface2)}
+.ex-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ex-img img.b{animation:exflip 3s steps(1) infinite}
+@keyframes exflip{0%{opacity:0}50%{opacity:1}}
+.how-img{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}
+.how-img img{width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:8px;background:var(--surface2)}
+.chip.core{font-size:11px;padding:1px 7px;vertical-align:2px;background:var(--sky-soft);color:var(--sky)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+@media (max-width:380px){.kpi b{font-size:24px}.today h2{font-size:28px}}
+</style>
+</head>
+<body>
+
+
+<div class="top"><div class="wrap" style="padding-bottom:0">
+  <div class="top-row">
+    <div class="ring"><svg viewBox="0 0 52 52" aria-hidden="true"><circle class="rb" cx="26" cy="26" r="23"/><circle class="rf" id="ringFg" cx="26" cy="26" r="23"/></svg><span class="num" id="lvlNum">1</span></div>
+    <div class="top-main">
+      <div class="top-name" id="lvlName">Rekrut</div>
+      <div class="bar"><i id="lvlBar" style="width:0%"></i></div>
+      <div class="small muted num" id="lvlNext">0 / 1.500 XP do naslednjega nivoja</div>
+    </div>
+    <div class="top-pts"><b class="num" id="ptsTotal">0</b><span class="label">XP</span></div>
+  </div>
+  <div class="sync" id="sync">Nalagam podatke …</div>
+  <div class="timer" id="timer" hidden><span>Počitek</span><span class="num" id="timerVal">1:30</span><button id="timerAdd">+30 s</button><button id="timerStop">Konec</button></div>
+</div></div>
+
+<main class="wrap">
+
+<!-- DANES -->
+<section class="view on" id="v-danes">
+  <div class="today" id="todayCard"></div>
+  <div class="kpis">
+    <div class="kpi" id="kStreakBox"><span class="label">Veriga</span><b class="num"><span id="kStreak">0</span><svg class="flame" viewBox="0 0 18 22" aria-hidden="true"><path d="M9 0c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-6 0 2 1 3 2 3 0-3-1-6 1-9z"/></svg></b><span class="small muted">tednov</span></div>
+    <div class="kpi"><span class="label">Ta teden</span><b class="num" id="kWeek">0/4</b><span class="small muted">treningov</span></div>
+    <div class="kpi"><span class="label">Skupaj</span><b class="num" id="kTotal">0</b><span class="small muted">treningov</span></div>
+  </div>
+  <div class="stack">
+    <div class="row between"><h3>Ta teden</h3><span class="small muted" id="weekRange"></span></div>
+    <div class="week" id="weekStrip"></div>
+    <div class="row small muted" style="gap:14px"><span class="row" style="gap:5px"><i class="dot d-gym"></i>fitnes</span><span class="row" style="gap:5px"><i class="dot d-rehab"></i>rehab</span><span class="row" style="gap:5px"><i class="dot d-cardio"></i>kardio</span><span class="row" style="gap:5px"><i class="dot d-foot"></i>nogomet</span></div>
+  </div>
+  <div class="stack">
+    <div class="row between"><h3>Dnevne naloge</h3><span class="small muted num" id="questCount">0/4</span></div><div class="questbar" id="questBar"><i></i><i></i><i></i><i></i></div>
+    <div class="prot">
+      <div class="row between"><span><b>Beljakovine</b> <span class="muted small">cilj 190 g</span></span><span class="pts">+15</span></div>
+      <div class="bar green"><i id="protBar" style="width:0%"></i></div>
+      <div class="row between"><span class="num" id="protVal">0 g</span>
+        <div class="prot-btns"><button class="btn sm" data-prot="20">+20 g</button><button class="btn sm" data-prot="30">+30 g</button><button class="btn sm" data-prot="45">+45 g</button><button class="btn sm ghost" data-prot="-1">Ponastavi</button></div>
+      </div>
+    </div>
+    <div id="dailyChecks" class="stack" style="gap:8px"></div>
+  </div>
+  <div class="stack">
+    <h3>Hitri vpis</h3>
+    <div class="grid3">
+      <button class="btn" data-act="cardio">Kardio<br><span class="pts">+40</span></button>
+      <button class="btn" data-act="football">Nogomet<br><span class="pts">+30</span></button>
+      <button class="btn" data-go="rehab">Rehab<br><span class="pts">+40</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- TRENING -->
+<section class="view" id="v-trening">
+  <div class="seg" id="daySeg"></div>
+  <div id="dayIntro" class="stack" style="gap:6px"></div>
+  <div id="exList" class="stack"></div>
+  <div class="stack">
+    <button class="btn primary block" id="finishBtn">Zaključi trening</button>
+    <button class="btn ghost block" id="discardBtn">Počisti vnose</button>
+  </div>
+  <div class="card stack">
+    <h3>Kako napredovati</h3>
+    <ul class="clean small">
+      <li>Ko pri vseh serijah narediš zgornjo mejo ponovitev z 1–2 v rezervi, naslednjič dodaj težo: zgornji del 2,5 kg, noge 5 kg, zgibi in dipsi 1,25–2,5 kg.</li>
+      <li>Pri zgibih in dipsih vpiši samo <b>dodatno</b> težo (0 = lastna teža).</li>
+      <li>Vsak 6. teden je deload: polovica serij, iste teže.</li>
+      <li><b>Core</b> je na koncu vsakega treninga. Brez močnega trupa ni Nordica: pri Nordicu trup in boki ostanejo ravni od kolen do glave. Ko zdržiš zgornjo mejo, otežaj (plošča na hrbet, dlje roke pri ab wheelu).</li>
+    </ul>
+  </div>
+</section>
+
+<!-- REHAB -->
+<section class="view" id="v-rehab">
+  <div class="stack" style="gap:6px">
+    <h2>Zadnja stegenska mišica</h2>
+    <p class="muted">Ne raztezaj je, obremenjuj jo postopoma. Izberi fazo, v kateri si zdaj.</p>
+  </div>
+  <div class="phase" id="phaseSel"></div>
+  <div class="card stack" id="phaseCard"></div>
+  <div class="card stack">
+    <div class="row between"><h3>Bolečina med vajo</h3><span class="pain-val num" id="painVal">2</span></div>
+    <input type="range" id="painRange" min="0" max="10" step="1" value="2" aria-label="Bolečina od 0 do 10">
+    <div class="small muted">Do 3/10 je v redu. Naslednje jutro ne sme biti slabše kot prejšnje.</div>
+    <div id="painWarn"></div>
+    <button class="btn green block" id="rehabDoneBtn">Zaključi rehab (+40)</button>
+  </div>
+  <div class="card stack">
+    <h3>Jutranja bolečina</h3>
+    <div class="row" id="morningBtns"></div>
+    <div id="painHist" class="small"></div>
+  </div>
+  <div class="note warn stack">
+    <b>K zdravniku ali fizioterapevtu, če:</b>
+    <ul class="clean small">
+      <li>si ob poškodbi začutil ali slišal »pok«</li>
+      <li>je na zadnji strani stegna modrica ali oteklina</li>
+      <li>težko hodiš ali šepaš</li>
+      <li>se bolečina širi iz križa ali zadnjice po nogi, ali imaš mravljinčenje ali otrplost</li>
+      <li>je bolečina tik pod zadnjico, ob kosti, in je ostra pri sedenju</li>
+      <li>po 2–3 tednih faz 1 in 2 ni bolje</li>
+    </ul>
+    <span class="small">To ni zdravniški nasvet. 1–2 obiska pri športnem fizioterapevtu sta več vredna kot nove masaže.</span>
+  </div>
+  <div id="rehabFinish"></div>
+</section>
+
+<!-- HRANA -->
+<section class="view" id="v-hrana">
+  <div class="stack" style="gap:6px">
+    <h2>Jedilnik</h2>
+    <p class="muted">Okoli 3.000 kcal na trening dan, 2.800 na prost dan, vsak dan 190–200 g beljakovin.</p>
+  </div>
+  <div class="seg two" id="foodSeg"><button class="on" data-f="t">Trening dan</button><button data-f="p">Prost dan</button></div>
+  <div class="grid2" id="foodTargets"></div>
+  <div class="card scroll-x"><table class="tbl" id="mealTbl"></table></div>
+  <div class="card stack">
+    <h3>Zamenjave</h3>
+    <div class="scroll-x"><table class="tbl">
+      <tr><th>Namesto</th><th>Lahko vzameš</th></tr>
+      <tr><td>200 g piščančjih prsi</td><td>200 g puranjih prsi, 2 konzervi tune, 250 g pustega govejega</td></tr>
+      <tr><td>250 g skute</td><td>300 g grškega jogurta, 2 proteinska pudinga</td></tr>
+      <tr><td>100 g riža</td><td>100 g ajdove kaše, 400 g krompirja, 100 g testenin, 4 kosi kruha</td></tr>
+      <tr><td>Jajca</td><td>Tofu, 150 g ribe</td></tr>
+      <tr><td>Oreški</td><td>Žlica arašidovega masla, pol avokada</td></tr>
+    </table></div>
+  </div>
+  <div class="card stack">
+    <h3>Pravila</h3>
+    <ul class="clean small">
+      <li>Vsak obrok: beljakovine (dlan do dve), pol krožnika zelenjave, priloga (pest do dve).</li>
+      <li>Študentski boni: meni z mesom ali ribo, solata, manj ocvrtega.</li>
+      <li>Alkohol in sladke pijače so največje skrite kalorije.</li>
+      <li>En prost obrok na teden s prijatelji je v redu.</li>
+      <li>Dodatki: whey, kreatin 3–5 g na dan, vitamin D pozimi.</li>
+      <li>Če povprečna teža 2 tedna ne pade: −200 kcal. Če padaš več kot 1 kg na teden: +200 kcal.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- NAPREDEK -->
+<section class="view" id="v-napredek">
+  <div class="card stack">
+    <h3>Vpiši težo</h3>
+    <div class="grid2">
+      <div class="field"><label class="label" for="wKg">Teža (kg)</label><input id="wKg" type="number" inputmode="decimal" step="0.1" placeholder="115.0"></div>
+      <div class="field"><label class="label" for="wWaist">Pas (cm, neobvezno)</label><input id="wWaist" type="number" inputmode="decimal" step="0.5" placeholder="105"></div>
+    </div>
+    <button class="btn primary block" id="wAdd">Shrani (+5)</button>
+  </div>
+  <div class="stack">
+    <div class="row between"><h3>Teža</h3><span class="small muted num" id="wSummary"></span></div>
+    <div class="card chart" id="wChart"></div>
+  </div>
+  <div class="stack" id="photoSec">
+    <div class="row between"><h3>Progres slike</h3><span class="small muted num" id="photoCount"></span></div>
+    <div class="seg" id="poseSeg" style="grid-template-columns:repeat(3,1fr)"><button class="on" data-pose="spredaj">Spredaj</button><button data-pose="stran">S strani</button><button data-pose="zadaj">Zadaj</button></div>
+    <div id="compare"></div>
+    <input type="file" id="photoIn" class="vh" accept="image/*">
+    <label class="btn primary block" for="photoIn" id="photoBtn" style="text-align:center">Dodaj sliko (+20 XP)</label>
+    <div class="photos" id="photoGrid"></div>
+    <p class="small muted" id="photoNote">Vsake 4 tedne: spredaj, s strani in zadaj, ob isti svetlobi in uri. Slike so shranjene samo na tem telefonu, ne v bazi.</p>
+  </div>
+  <div class="stack">
+    <div class="row between">
+      <h3 id="calTitle">Koledar</h3>
+      <div class="row" style="gap:6px"><button class="btn sm ghost" id="calPrev" aria-label="Prejšnji mesec">‹</button><button class="btn sm ghost" id="calNext" aria-label="Naslednji mesec">›</button></div>
+    </div>
+    <div class="cal" id="cal"></div>
+    <p class="small muted">Oranžen X = trening ali rehab. Zelena = kardio ali nogomet. Ne prekini verige.</p>
+  </div>
+  <div class="stack">
+    <h3>Osebni rekordi</h3>
+    <div class="card scroll-x" id="prTbl"></div>
+  </div>
+  <div class="stack">
+    <h3>Zgodovina</h3>
+    <div class="card" id="histList"></div>
+  </div>
+  <div class="card stack">
+    <h3>Varnostna kopija</h3>
+    <p class="small muted">Vse se sproti shranjuje v bazo. Za vsak slučaj lahko podatke izvoziš v datoteko in jih kadarkoli uvoziš nazaj. Uvoz ničesar ne briše, samo doda manjkajoče.</p>
+    <div class="grid2">
+      <button class="btn ghost" id="exportBtn">Izvozi</button>
+      <label class="btn ghost" for="importIn" style="text-align:center">Uvozi</label>
+    </div>
+    <input type="file" id="importIn" class="vh" accept="application/json,.json">
+  </div>
+</section>
+
+<!-- NAGRADE -->
+<section class="view" id="v-nagrade">
+  <div class="stack" style="gap:6px">
+    <h2>Nagrade</h2>
+    <p class="muted">Ko dosežeš mejnik, si nagrado prevzemi. Besedilo nagrade lahko spremeniš.</p>
+  </div>
+  <div class="card stack"><div class="row between"><h3>Značke</h3><span class="small muted num" id="badgeCount"></span></div><div class="badges" id="badgeGrid"></div><p class="small muted">Vsaka značka prinese +50 XP.</p></div>
+  <div id="rewardList" class="stack"></div>
+  <div class="card stack">
+    <h3>Nivoji</h3>
+    <div class="levels" id="levelList"></div>
+  </div>
+  <div class="card stack">
+    <h3>Kako dobiš XP</h3>
+    <table class="tbl">
+      <tr><td>Zaključen trening (vsaj 70 % serij)</td><td class="r">+100</td></tr>
+      <tr><td>Vsaka opravljena serija</td><td class="r">+5</td></tr>
+      <tr><td>Osebni rekord pri vaji</td><td class="r">+25</td></tr>
+      <tr><td>Rehab ali kardio</td><td class="r">+40</td></tr>
+      <tr><td>Nogomet</td><td class="r">+30</td></tr>
+      <tr><td>Beljakovine 190 g / spanje 7 h / koraki 8.000 / voda 3 l</td><td class="r">+15 / 10 / 10 / 5</td></tr>
+      <tr><td>Vpis teže</td><td class="r">+5</td></tr>
+      <tr><td>Teden s 4 treningi</td><td class="r">+150</td></tr>
+      <tr><td>Progres slika</td><td class="r">+20</td></tr>
+      <tr><td>Nova značka</td><td class="r">+50</td></tr>
+    </table>
+  </div>
+  <div class="card stack">
+    <h3>Pet pravil</h3>
+    <ol class="clean small" style="padding-left:20px">
+      <li>Fiksni termini s punco in prijatelji: pon, tor, čet, ned.</li>
+      <li>Nikoli dvakrat zapored ne izpusti treninga.</li>
+      <li>Ko se ti ne da: samo 20 minut in prve 3 vaje.</li>
+      <li>V 4. tednu in okoli 3. meseca bo težje. Takrat deload, ne konec.</li>
+      <li>Stava: kdor v mesecu izpusti več kot 2 treninga, plača kavo.</li>
+    </ol>
+  </div>
+</section>
+</main>
+
+<div class="toast" id="toast"></div>
+<div class="lvlup" id="lvlUp" hidden><canvas id="confetti"></canvas><div class="box"><span class="label" style="color:#ffd9c2">Nov nivo</span><div class="big num" id="luNum">2</div><h2 id="luName">Redni</h2><p id="luText" style="max-width:30ch;opacity:.85"></p><button class="btn primary" id="luClose">Gremo naprej</button></div></div>
+
+<nav class="tabs"><div class="in" id="tabs">
+  <button data-tab="danes" class="on"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Danes</button>
+  <button data-tab="trening"><svg viewBox="0 0 24 24"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></svg>Trening</button>
+  <button data-tab="rehab"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"/></svg>Rehab</button>
+  <button data-tab="hrana"><svg viewBox="0 0 24 24"><path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v8M7 7h4M17 3c-2 2-2 6 0 8v10"/></svg>Hrana</button>
+  <button data-tab="napredek"><svg viewBox="0 0 24 24"><path d="M3 20h18M6 16l4-5 3 3 5-7"/></svg>Napredek</button>
+  <button data-tab="nagrade"><svg viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 21h8M9 17h6v4H9z"/></svg>Nagrade</button>
+</div></nav>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script>if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(function(){});</script>
+
+</body>
+</html>
