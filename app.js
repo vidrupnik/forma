@@ -138,6 +138,7 @@ function dayDef(day){
   return {name:B.name,sub:B.sub,short:B.short,lower:false,ex:routineList(day).map(function(it){var L=libEx(it.lib)||{name:it.name||"Vaja",cat:"moje"};
     return {id:it.uid,lib:it.lib,name:L.name,sets:+it.sets||+L.sets||3,reps:it.reps||L.reps||"",bw:!!L.bw,unit:L.unit||"",core:L.cat==="core",img:L.img,how:L.how,yt:L.yt,link:L.link,note:L.note,g:L.g,custom:!!L.custom}})};
 }
+function migrateRoutine(){if(IS_B&&(S.profile.routineV||1)<BR.ROUTINE_V){delete S.profile.routine;S.profile.routineV=BR.ROUTINE_V;saveProfile();return true}return false}
 function wDef(w){var D=dayDef(w.day); if(w.ex) return {name:(D&&D.name)||w.name||"Trening",ex:w.ex}; return D}
 
 /* ---------- state ---------- */
@@ -249,6 +250,7 @@ function pull(){
     else if((draft._t||0)>((dr&&dr._t)||0)) dirty.draft=++seq;
     Object.keys(dirty).forEach(function(id){if(id.indexOf("w-")===0){if(S.workouts[id])ws[id]=S.workouts[id];else delete ws[id]}});
     S.workouts=ws; saveLocal(); lsSet(PFX+"vf-draft",draft); lsSet(PFX+"vf-dirty",dirty); online=true;
+    migrateRoutine();
     if(JSON.stringify([S,draft])!==before) renderAll(true);
     if(Object.keys(dirty).length) push(); else setSync("Vse shranjeno");
   }).catch(function(e){online=false;console.warn("forma pull",e);setSync("Ni povezave z bazo. Delam s podatki na telefonu.")});
@@ -257,6 +259,7 @@ function setSync(t){document.getElementById("sync").textContent=t}
 function initStore(){
   var cached=lsGet(PFX+"vf-state"); if(cached&&cached.profile){S=cached; S.profile=Object.assign(emptyProfile(),S.profile); S.workouts=S.workouts||{}}
   draft=lsGet(PFX+"vf-draft")||{};
+  if(cached&&cached.profile&&cached.profile._t) migrateRoutine();
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
   renderAll();
   if(!REMOTE){setSync("Shranjeno na tem telefonu (baza ni nastavljena)");return}
