@@ -22,3 +22,10 @@ Spletna aplikacija (PWA): gostuje na GitHub Pages, podatki so v Supabase projekt
 Imena vaj so v angleščini, slike so iz [free-exercise-db](https://github.com/yuhonas/free-exercise-db) (javna domena).
 Vsak trening ima vsaj eno core vajo (Pallof Press, Hanging Leg Raise, RKC Plank, Ab Wheel Rollout) kot pripravo na Nordic.
 Nove vaje dodaj vedno na konec seznama dneva v `app.js`, ker se shranjeni treningi sklicujejo na položaj vaje.
+
+## Profila Vid in Brina
+- Ob prvem odprtju izbereš profil, zamenjaš ga zgoraj desno ("· zamenjaj"). Podatki so ločeni (v bazi ima Brina vrstice s predpono `b.`).
+- Brina ima roza videz, svojo rutino (Rit A, Zgornji, Rit B, Rit C), prehrano in nagrade ter zavihek **Vaje** namesto Rehab.
+- Vaje: knjižnica ~55 vaj (filtri Rit, Stranska rit, Noge, Zgornji del, Core, Moje). Vajo dodaš v trening ali z njo zamenjaš obstoječo.
+- Trening > Uredi: premikanje, zamenjava, odstranitev vaj, serije in ponovitve.
+- Svoja vaja (npr. s TikToka): ime, povezava do videa, skupina, ritne mišice, opomba. Shrani se v "Moje".

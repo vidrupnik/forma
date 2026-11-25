@@ -7,6 +7,7 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
 <title>Forma</title>
+<script>try{if(localStorage.getItem("forma-who")==="brina"){document.documentElement.setAttribute("data-who","brina")}}catch(e){}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Forma">
@@ -162,7 +163,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 
 /* field */
 .field{display:flex;flex-direction:column;gap:4px;min-width:0}
-.field input{padding:11px;border-radius:9px;border:1px solid var(--line);background:var(--bg);font-size:16px;width:100%;min-width:0}
+.field input,.field select,.edit-row input{padding:11px;border-radius:9px;border:1px solid var(--line);background:var(--bg);font-size:16px;width:100%;min-width:0}
 
 /* chart */
 .chart svg{width:100%;height:auto;display:block}
@@ -253,6 +254,42 @@ details.how ol{margin:8px 0 10px;padding-left:20px;font-size:14px;display:flex;f
 @keyframes exflip{0%{opacity:0}50%{opacity:1}}
 .how-img{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}
 .how-img img{width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:8px;background:var(--surface2)}
+/* profil */
+:root[data-who="brina"]{
+  --bg:#fbf2f6; --surface:#ffffff; --surface2:#f6e4ec; --line:#eccfdc;
+  --fg:#2b1420; --muted:#7c5a69; --accent:#d6286f; --accent-fg:#ffffff; --accent-soft:#fcdcea;
+  --sky:#b0306f; --sky-soft:#f9e0ec; --gold:#c98a1e;
+  --hero-a:#5a1236; --hero-b:#a52a64; --hero-fg:#fff4f9}
+@media (prefers-color-scheme: dark){:root[data-who="brina"]:not([data-theme="light"]){
+  --bg:#170b11; --surface:#21111a; --surface2:#2d1823; --line:#432333;
+  --fg:#f8e9f0; --muted:#c99db1; --accent:#f472b6; --accent-fg:#2b0617; --accent-soft:#4b1a31;
+  --sky:#f9a8d4; --sky-soft:#3d1a2c; --hero-a:#4a1430; --hero-b:#170b11; color-scheme:dark}}
+:root[data-who="brina"][data-theme="dark"]{
+  --bg:#170b11; --surface:#21111a; --surface2:#2d1823; --line:#432333;
+  --fg:#f8e9f0; --muted:#c99db1; --accent:#f472b6; --accent-fg:#2b0617; --accent-soft:#4b1a31;
+  --sky:#f9a8d4; --sky-soft:#3d1a2c; --hero-a:#4a1430; --hero-b:#170b11; color-scheme:dark}
+:root[data-who="brina"] .only-vid,:root:not([data-who="brina"]) .only-brina{display:none!important}
+:root[data-who="brina"] .lvlup .big{color:#f472b6}
+.sync-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:4px}
+.sync-row .sync{margin-top:0}
+.whobtn{font:inherit;font-size:11px;font-weight:600;color:var(--accent);background:none;border:0;padding:4px 0;cursor:pointer}
+.whopick{position:fixed;inset:0;z-index:60;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px}
+.whopick h2{font-family:var(--display);font-size:40px;margin:0}
+.whopick .opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:360px}
+.whopick button{font:inherit;font-family:var(--display);font-size:28px;font-weight:700;border-radius:16px;padding:28px 10px;border:0;cursor:pointer;color:#fff}
+.whopick .v{background:#e4570f}.whopick .b{background:#d6286f}
+.ex-img.noimg{display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:22px;color:var(--accent);background:var(--accent-soft)}
+.gchips{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.chip.g{background:var(--accent-soft);color:var(--accent);font-size:10px;padding:1px 7px}
+.edit-row{display:grid;grid-template-columns:1fr 1.4fr;gap:8px}
+.edit-row label{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.edit-btns{display:flex;flex-wrap:wrap;gap:6px}
+.pickdays{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.seg.scroll{display:flex;overflow-x:auto;scrollbar-width:none}
+.seg.scroll button{flex:none;padding-inline:14px}
+.cform{display:flex;flex-direction:column;gap:10px}
+.cform .chk{display:flex;flex-wrap:wrap;gap:12px;font-size:14px}
+.cform .chk label{display:flex;gap:6px;align-items:center}
 .chip.core{font-size:11px;padding:1px 7px;vertical-align:2px;background:var(--sky-soft);color:var(--sky)}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 @media (max-width:380px){.kpi b{font-size:24px}.today h2{font-size:28px}}
@@ -271,7 +308,7 @@ details.how ol{margin:8px 0 10px;padding-left:20px;font-size:14px;display:flex;f
     </div>
     <div class="top-pts"><b class="num" id="ptsTotal">0</b><span class="label">XP</span></div>
   </div>
-  <div class="sync" id="sync">Nalagam podatke …</div>
+  <div class="sync-row"><div class="sync" id="sync">Nalagam podatke …</div><button class="whobtn" id="whoBtn">Zamenjaj profil</button></div>
   <div class="timer" id="timer" hidden><span>Počitek</span><span class="num" id="timerVal">1:30</span><button id="timerAdd">+30 s</button><button id="timerStop">Konec</button></div>
 </div></div>
 
@@ -288,12 +325,12 @@ details.how ol{margin:8px 0 10px;padding-left:20px;font-size:14px;display:flex;f
   <div class="stack">
     <div class="row between"><h3>Ta teden</h3><span class="small muted" id="weekRange"></span></div>
     <div class="week" id="weekStrip"></div>
-    <div class="row small muted" style="gap:14px"><span class="row" style="gap:5px"><i class="dot d-gym"></i>fitnes</span><span class="row" style="gap:5px"><i class="dot d-rehab"></i>rehab</span><span class="row" style="gap:5px"><i class="dot d-cardio"></i>kardio</span><span class="row" style="gap:5px"><i class="dot d-foot"></i>nogomet</span></div>
+    <div class="row small muted" style="gap:14px"><span class="row" style="gap:5px"><i class="dot d-gym"></i>fitnes</span><span class="row only-vid" style="gap:5px"><i class="dot d-rehab"></i>rehab</span><span class="row" style="gap:5px"><i class="dot d-cardio"></i>kardio</span><span class="row only-vid" style="gap:5px"><i class="dot d-foot"></i>nogomet</span></div>
   </div>
   <div class="stack">
     <div class="row between"><h3>Dnevne naloge</h3><span class="small muted num" id="questCount">0/4</span></div><div class="questbar" id="questBar"><i></i><i></i><i></i><i></i></div>
     <div class="prot">
-      <div class="row between"><span><b>Beljakovine</b> <span class="muted small">cilj 190 g</span></span><span class="pts">+15</span></div>
+      <div class="row between"><span><b>Beljakovine</b> <span class="muted small">cilj <span class="protGoal">190</span> g</span></span><span class="pts">+15</span></div>
       <div class="bar green"><i id="protBar" style="width:0%"></i></div>
       <div class="row between"><span class="num" id="protVal">0 g</span>
         <div class="prot-btns"><button class="btn sm" data-prot="20">+20 g</button><button class="btn sm" data-prot="30">+30 g</button><button class="btn sm" data-prot="45">+45 g</button><button class="btn sm ghost" data-prot="-1">Ponastavi</button></div>
@@ -305,8 +342,9 @@ details.how ol{margin:8px 0 10px;padding-left:20px;font-size:14px;display:flex;f
     <h3>Hitri vpis</h3>
     <div class="grid3">
       <button class="btn" data-act="cardio">Kardio<br><span class="pts">+40</span></button>
-      <button class="btn" data-act="football">Nogomet<br><span class="pts">+30</span></button>
-      <button class="btn" data-go="rehab">Rehab<br><span class="pts">+40</span></button>
+      <button class="btn only-vid" data-act="football">Nogomet<br><span class="pts">+30</span></button>
+      <button class="btn only-vid" data-go="rehab">Rehab<br><span class="pts">+40</span></button>
+      <button class="btn only-brina" data-go="vaje">Knjižnica<br><span class="pts">vaj</span></button>
     </div>
   </div>
 </section>
@@ -316,11 +354,21 @@ details.how ol{margin:8px 0 10px;padding-left:20px;font-size:14px;display:flex;f
   <div class="seg" id="daySeg"></div>
   <div id="dayIntro" class="stack" style="gap:6px"></div>
   <div id="exList" class="stack"></div>
-  <div class="stack">
+  <div class="stack" id="finishBtns">
     <button class="btn primary block" id="finishBtn">Zaključi trening</button>
     <button class="btn ghost block" id="discardBtn">Počisti vnose</button>
   </div>
-  <div class="card stack">
+  <div class="card stack only-brina">
+    <h3>Kako napredovati</h3>
+    <ul class="clean small">
+      <li>Ko v vseh serijah narediš zgornjo mejo ponovitev z 1–2 v rezervi, dodaj težo: hip thrust in počep 2,5–5 kg, ostalo 1–2,5 kg.</li>
+      <li>Rit ima tri mišice. <b>Velika ritna</b> raste od hip thrusta, RDL in izpadnih korakov, <b>srednja in mala</b> (zgornji, stranski del, »okrogla« oblika) od abdukcij, kickbackov vstran in stranske opore. Vsak trening za rit ima vsaj eno od vsake.</li>
+      <li>Novo vajo (npr. s TikToka) preizkusi vsaj 3 tedne, preden presodiš. Če jo čutiš v riti in lahko dodajaš težo, ostane.</li>
+      <li>Rit dobi okoli 20 serij na teden v 3 treningih. Več ni nujno bolje, pomembneje je napredovanje.</li>
+      <li>Vsak 6. teden je deload: polovica serij, iste teže.</li>
+    </ul>
+  </div>
+  <div class="card stack only-vid">
     <h3>Kako napredovati</h3>
     <ul class="clean small">
       <li>Ko pri vseh serijah narediš zgornjo mejo ponovitev z 1–2 v rezervi, naslednjič dodaj težo: zgornji del 2,5 kg, noge 5 kg, zgibi in dipsi 1,25–2,5 kg.</li>
@@ -366,11 +414,39 @@ details.how ol{margin:8px 0 10px;padding-left:20px;font-size:14px;display:flex;f
   <div id="rehabFinish"></div>
 </section>
 
+<!-- VAJE (Brina) -->
+<section class="view" id="v-vaje">
+  <div class="stack" style="gap:6px">
+    <h2>Knjižnica vaj</h2>
+    <p class="muted">Preizkusi nove vaje, zamenjaj tiste, ki ti ne ustrezajo, in sestavi svojo rutino. Vaje s TikToka dodaš spodaj.</p>
+  </div>
+  <div id="libSwap"></div>
+  <details class="card cform" id="customForm">
+    <summary class="btn primary block" style="list-style:none;text-align:center">+ Dodaj svojo vajo (npr. s TikToka)</summary>
+    <div class="cform" style="margin-top:12px">
+      <div class="field"><label class="label" for="cName">Ime vaje</label><input id="cName" maxlength="80" placeholder="npr. Smith Machine Kickback"></div>
+      <div class="field"><label class="label" for="cLink">Povezava do videa (neobvezno)</label><input id="cLink" type="url" inputmode="url" placeholder="https://www.tiktok.com/…"></div>
+      <div class="grid2">
+        <div class="field"><label class="label" for="cCat">Skupina</label><select id="cCat"><option value="rit">Rit</option><option value="noge">Noge</option><option value="zgornji">Zgornji del</option><option value="core">Core</option></select></div>
+        <div class="field"><label class="label" for="cSets">Serije</label><input id="cSets" type="number" inputmode="numeric" min="1" max="10" value="3"></div>
+      </div>
+      <div class="field"><label class="label" for="cReps">Ponovitve</label><input id="cReps" maxlength="30" placeholder="10–12"></div>
+      <div class="field"><span class="label">Katero ritno mišico zadene (neobvezno)</span><div class="chk"><label><input type="checkbox" data-cg="max">velika</label><label><input type="checkbox" data-cg="med">srednja</label><label><input type="checkbox" data-cg="min">mala</label><label><input type="checkbox" id="cBw">lastna teža</label></div></div>
+      <div class="field"><label class="label" for="cNote">Opomba (neobvezno)</label><input id="cNote" maxlength="300" placeholder="npr. elastika nad koleni, počasi navzdol"></div>
+      <div class="field"><label class="label" for="cDay">Kam</label><select id="cDay"></select></div>
+      <button class="btn primary block" id="cSave">Shrani vajo</button>
+    </div>
+  </details>
+  <div class="seg scroll" id="libCats"></div>
+  <div id="libList" class="stack"></div>
+</section>
+
 <!-- HRANA -->
 <section class="view" id="v-hrana">
   <div class="stack" style="gap:6px">
     <h2>Jedilnik</h2>
-    <p class="muted">Okoli 3.000 kcal na trening dan, 2.800 na prost dan, vsak dan 190–200 g beljakovin.</p>
+    <p class="muted only-vid">Okoli 3.000 kcal na trening dan, 2.800 na prost dan, vsak dan 190–200 g beljakovin.</p>
+    <p class="muted only-brina">Za rast riti potrebuješ rahel kalorični presežek: okoli 2.300–2.400 kcal na trening dan, 2.100–2.200 na prost dan in 110–130 g beljakovin (2 g na kg).</p>
   </div>
   <div class="seg two" id="foodSeg"><button class="on" data-f="t">Trening dan</button><button data-f="p">Prost dan</button></div>
   <div class="grid2" id="foodTargets"></div>
@@ -386,7 +462,17 @@ details.how ol{margin:8px 0 10px;padding-left:20px;font-size:14px;display:flex;f
       <tr><td>Oreški</td><td>Žlica arašidovega masla, pol avokada</td></tr>
     </table></div>
   </div>
-  <div class="card stack">
+  <div class="card stack only-brina">
+    <h3>Pravila</h3>
+    <ul class="clean small">
+      <li>Vsak obrok: vir beljakovin (dlan do dve), zelenjava, priloga (pest do dve).</li>
+      <li>Cilj je počasna rast: okoli +0,25 kg na teden. Če se povprečna teža 3 tedne ne premakne, dodaj 150 kcal (npr. banana in žlica arašidovega masla).</li>
+      <li>Ogljikovi hidrati pred treningom pomagajo, da dvigneš več.</li>
+      <li>Dodatki: kreatin 3–5 g na dan, vitamin D pozimi, whey, če beljakovin ne dobiš s hrano.</li>
+      <li>To so okvirne številke. Pri motnjah hranjenja ali zdravstvenih težavah se posvetuj z dietetikom.</li>
+    </ul>
+  </div>
+  <div class="card stack only-vid">
     <h3>Pravila</h3>
     <ul class="clean small">
       <li>Vsak obrok: beljakovine (dlan do dve), pol krožnika zelenjave, priloga (pest do dve).</li>
@@ -405,7 +491,7 @@ details.how ol{margin:8px 0 10px;padding-left:20px;font-size:14px;display:flex;f
     <h3>Vpiši težo</h3>
     <div class="grid2">
       <div class="field"><label class="label" for="wKg">Teža (kg)</label><input id="wKg" type="number" inputmode="decimal" step="0.1" placeholder="115.0"></div>
-      <div class="field"><label class="label" for="wWaist">Pas (cm, neobvezno)</label><input id="wWaist" type="number" inputmode="decimal" step="0.5" placeholder="105"></div>
+      <div class="field"><label class="label" for="wWaist" id="wWaistLab">Pas (cm, neobvezno)</label><input id="wWaist" type="number" inputmode="decimal" step="0.5" placeholder="105"></div>
     </div>
     <button class="btn primary block" id="wAdd">Shrani (+5)</button>
   </div>
@@ -468,8 +554,8 @@ details.how ol{margin:8px 0 10px;padding-left:20px;font-size:14px;display:flex;f
       <tr><td>Vsaka opravljena serija</td><td class="r">+5</td></tr>
       <tr><td>Osebni rekord pri vaji</td><td class="r">+25</td></tr>
       <tr><td>Rehab ali kardio</td><td class="r">+40</td></tr>
-      <tr><td>Nogomet</td><td class="r">+30</td></tr>
-      <tr><td>Beljakovine 190 g / spanje 7 h / koraki 8.000 / voda 3 l</td><td class="r">+15 / 10 / 10 / 5</td></tr>
+      <tr class="only-vid"><td>Nogomet</td><td class="r">+30</td></tr>
+      <tr><td>Beljakovine <span class="protGoal">190</span> g / spanje 7 h / koraki 8.000 / voda 3 l</td><td class="r">+15 / 10 / 10 / 5</td></tr>
       <tr><td>Vpis teže</td><td class="r">+5</td></tr>
       <tr><td>Teden s 4 treningi</td><td class="r">+150</td></tr>
       <tr><td>Progres slika</td><td class="r">+20</td></tr>
@@ -479,7 +565,7 @@ details.how ol{margin:8px 0 10px;padding-left:20px;font-size:14px;display:flex;f
   <div class="card stack">
     <h3>Pet pravil</h3>
     <ol class="clean small" style="padding-left:20px">
-      <li>Fiksni termini s punco in prijatelji: pon, tor, čet, ned.</li>
+      <li class="only-vid">Fiksni termini s punco in prijatelji: pon, tor, čet, ned.</li><li class="only-brina">Fiksni termini z Vidom: pon, tor, čet, ned.</li>
       <li>Nikoli dvakrat zapored ne izpusti treninga.</li>
       <li>Ko se ti ne da: samo 20 minut in prve 3 vaje.</li>
       <li>V 4. tednu in okoli 3. meseca bo težje. Takrat deload, ne konec.</li>
@@ -490,18 +576,21 @@ details.how ol{margin:8px 0 10px;padding-left:20px;font-size:14px;display:flex;f
 </main>
 
 <div class="toast" id="toast"></div>
+<div class="whopick" id="whoPick" hidden><h2>Kdo trenira?</h2><p class="muted" style="margin:0;text-align:center">Vsak ima svoj program in svoje podatke. Profil lahko kadarkoli zamenjaš zgoraj.</p><div class="opts"><button class="v" data-who="vid">Vid</button><button class="b" data-who="brina">Brina</button></div></div>
 <div class="lvlup" id="lvlUp" hidden><canvas id="confetti"></canvas><div class="box"><span class="label" style="color:#ffd9c2">Nov nivo</span><div class="big num" id="luNum">2</div><h2 id="luName">Redni</h2><p id="luText" style="max-width:30ch;opacity:.85"></p><button class="btn primary" id="luClose">Gremo naprej</button></div></div>
 
 <nav class="tabs"><div class="in" id="tabs">
   <button data-tab="danes" class="on"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Danes</button>
   <button data-tab="trening"><svg viewBox="0 0 24 24"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></svg>Trening</button>
-  <button data-tab="rehab"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"/></svg>Rehab</button>
+  <button data-tab="rehab" class="only-vid"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"/></svg>Rehab</button>
+  <button data-tab="vaje" class="only-brina"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h7M17 15v6M14 18h6"/></svg>Vaje</button>
   <button data-tab="hrana"><svg viewBox="0 0 24 24"><path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v8M7 7h4M17 3c-2 2-2 6 0 8v10"/></svg>Hrana</button>
   <button data-tab="napredek"><svg viewBox="0 0 24 24"><path d="M3 20h18M6 16l4-5 3 3 5-7"/></svg>Napredek</button>
   <button data-tab="nagrade"><svg viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 21h8M9 17h6v4H9z"/></svg>Nagrade</button>
 </div></nav>
 
 <script src="config.js"></script>
+<script src="brina.js"></script>
 <script src="app.js"></script>
 <script>if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(function(){});</script>
 
